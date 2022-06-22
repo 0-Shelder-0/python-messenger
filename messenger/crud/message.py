@@ -1,3 +1,5 @@
+from datetime import date
+
 from sqlalchemy.orm import Session
 
 import schemas.message as schema
@@ -44,10 +46,11 @@ def delete_message(db: Session, message_id: int, user_id: int):
 
 
 def get_last_messages_in_chat(db: Session, chat_id: int, user_id: int, count: int):
-    #todo add filter with current datetime
+    now = date.today()
     messages = db.query(Message).join(Chat) \
                    .filter(Message.chat_id == chat_id) \
                    .filter(Message.user_id == user_id) \
+                   .filter(Message.send_date <= now) \
                    .order_by(Message.send_date.desc())[:count]
     all_message_ids = list(map(lambda m: m.id, messages))
 

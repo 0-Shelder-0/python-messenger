@@ -55,7 +55,7 @@ def delete_user(db: Session, user_id: int, chat_id: int):
 
 
 def get_chat_by_id(db: Session, chat_id: int, user_id: int):
-    chat = db.query(Chat, UserChat).join(UserChat).filter(Chat.id == chat_id).filter(
+    chat = db.query(Chat).join(UserChat).filter(Chat.id == chat_id).filter(
         UserChat.user_id == user_id).one_or_none()
     users = []
     if chat is not None:
@@ -72,9 +72,8 @@ def update_chat(db: Session, user_id: int, chat: schema.UpdateChat):
         .one_or_none()
 
     if user_chat is not None:
-        chat_db = db.query(Chat).filter(Chat.id == chat.id).one_or_none()
         for param, value in chat.dict().items():
-            setattr(chat_db, param, value)
+            setattr(user_chat, param, value)
         db.commit()
 
         user_id_by_chat_rows = db.query(UserChat.user_id) \
@@ -91,10 +90,11 @@ def update_chat(db: Session, user_id: int, chat: schema.UpdateChat):
             user_chats_for_adding.append(UserChat(user_id=user_id_for_add, chat_id=chat.id))
         db.add_all(user_chats_for_adding)
 
-        db.query(UserChat).filter(UserChat.chat_id == chat.id).filter(UserChat.user_id.in_(user_ids_for_delete)).delete()
+        db.query(UserChat).filter(UserChat.chat_id == chat.id).filter(
+            UserChat.user_id.in_(user_ids_for_delete)).delete()
         db.commit()
 
-        return chat_db
+        return user_chat
 
 
 def delete_chat(db: Session, chat_id: int, user_id: int):

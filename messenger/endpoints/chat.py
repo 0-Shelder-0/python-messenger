@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 import crud.chat as crud
 import crud.user as crud_user
 from deps import get_db, get_current_user
-from schemas.chat import ChatInDB, CreateChat, UpdateChat
+from schemas.chat import ChatInDB, CreateChat, UpdateChat, ChatWithUsers
 
 router = APIRouter(prefix="/chat")
 
@@ -21,7 +21,8 @@ async def get_chats(count: int, user_id=Depends(get_current_user), db=Depends(ge
 
     return chats
 
-@router.get("/{chat_id}", response_model=ChatInDB)
+
+@router.get("/{chat_id}", response_model=ChatWithUsers)
 async def get_chat(chat_id: int, user_id=Depends(get_current_user), db=Depends(get_db)):
     """Получить чат текущего пользователя по заданному chat_id"""
 

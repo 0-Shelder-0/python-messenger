@@ -4,6 +4,7 @@ from typing import List
 from pydantic import BaseModel
 
 from crud.chatType import ChatType
+from schemas import user
 
 
 class Chat(BaseModel):
@@ -26,6 +27,13 @@ class UpdateChat(BaseModel):
 
 class ChatInDB(Chat):
     id: int
+
+    class Config:
+        orm_mode = True
+
+
+class ChatWithUsers(ChatInDB):
+    users: List[user.UserInDB]
 
     class Config:
         orm_mode = True
